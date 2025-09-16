@@ -38,5 +38,13 @@ def delete(id):
             t["id"] = all_tasks.index(t)
     with open("tasks.json", "w") as f:
         json.dump(data, f)
+@todo.command(help="lets you change the status of a task")
+@click.argument("task_id", nargs=1)
+@click.argument("status", nargs=1)
+def status(task_id, status):
+    all_tasks[int(task_id)]["status"] = status
+    with open("tasks.json", "w") as f:
+        json.dump(data, f)
+
 if __name__ == '__main__':
     todo()
