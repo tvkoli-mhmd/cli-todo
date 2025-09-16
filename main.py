@@ -5,7 +5,7 @@ with open("tasks.json") as f:
 @click.group()
 def todo():
     pass
-@click.command()
+@click.command(help="lets you add tasks!")
 @click.argument("task")
 def add(task):
     new_task = {
@@ -15,7 +15,7 @@ def add(task):
     all_tasks['tasks'].append(new_task)
     with open("tasks.json", 'w') as f:
         json.dump(all_tasks, f)
-@click.command()
+@click.command(help="lists all the current tasks! ")
 def show():
     if len(all_tasks['tasks']) > 0:
         for task in all_tasks['tasks']:
