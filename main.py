@@ -1,5 +1,7 @@
 import click
 import json
+from rich.console import Console
+from rich.table import Table
 with open("tasks.json") as f:
     data = json.load(f)
 all_tasks = data["tasks"]
@@ -63,11 +65,31 @@ def show(status, priority, arrange):
         else:
             click.echo("No tasks right now!")
     if arrange=="status":
-        filtered_tasks.sort(key=sort_by_status)
+        filtered_tasks.sort(key=sort_by_status) 
     else:
         filtered_tasks.sort(key=sort_by_priority, reverse=True)
-    for t in filtered_tasks:
-        click.echo(f"title : {t["title"]}, status : {t["status"]}, priority : {t["priority"]}, id : {t["id"]}")  
+    if len(all_tasks)>0:
+        table = Table(title="Todo", show_lines=True, padding=1)
+        table.add_column("title", style="cyan", justify="left", width=25, overflow="ellipsis")
+        table.add_column("status", justify="center", width=10)
+        table.add_column("priority", justify="center", width=10)
+        table.add_column("id", style="dim", justify="center", width=5)
+        for t in filtered_tasks:
+            status_color = ""
+            priority_color = ""
+            if t["status"]=="done":
+                status_color=f":white_heavy_check_mark: [green]{t["status"]}[/green]"
+            else:
+                status_color=f":hourglass: [yellow]{t["status"]}[/yellow]"
+            if t["priority"]=="low":
+                priority_color=f"[green]{t["priority"]}[/green]"
+            elif t["priority"]=="medium":
+                priority_color=f"[yellow]{t["priority"]}[/yellow]"
+            else:
+                priority_color=f"[red]{t["priority"]}[/red]"
+            table.add_row(str(t["title"]), status_color, priority_color, str(t["id"]))
+        console = Console()
+        console.print(table)
 @todo.command(help="lets you delete tasks!")
 @click.argument("id")
 def delete(id):
