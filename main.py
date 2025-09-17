@@ -7,8 +7,8 @@ all_tasks = data["tasks"]
 def todo():
     pass
 @todo.command(help="lets you add tasks!")
-@click.argument("task", nargs=1)
-@click.argument("priority", nargs=1)
+@click.argument("task", nargs=1, default="task1")
+@click.argument("priority", nargs=1, default="low", type=click.Choice(["low", "medium", "high"]))
 def add(task, priority):
     new_task = {
         "title" : task,
@@ -57,7 +57,7 @@ def delete(id):
         json.dump(data, f)
 @todo.command(help="lets you change the status of a task")
 @click.argument("task_id", nargs=1)
-@click.argument("status", nargs=1)
+@click.argument("status", nargs=1, type=click.Choice(["done", "pending"]), default="done")
 def status(task_id, status):
     all_tasks[int(task_id)]["status"] = status
     with open("tasks.json", "w") as f:
@@ -65,7 +65,7 @@ def status(task_id, status):
 @todo.command(help="lets you edit your tasks including title and priority")
 @click.argument("task_id", nargs=1)
 @click.option("--title", help="lets you change the title of a task")
-@click.option("--priority", help="lets you change the priority of a task")
+@click.option("--priority", help="lets you change the priority of a task", type=click.Choice(["low", "medium", "high"]))
 def edit(task_id, title, priority):
     if title!=None:
         all_tasks[int(task_id)]["title"] = title
