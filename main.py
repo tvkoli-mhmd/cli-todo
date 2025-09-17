@@ -25,25 +25,49 @@ def add(task, priority):
 @todo.command(help="lists all the current tasks! ")
 @click.option("--status", help="only shows tasks with specified status by the user", default="all", type=click.Choice(["done", "pending", "all"]))
 @click.option("--priority", help="only shows tasks with specified priority by the user", default="all", type=click.Choice(["low", "medium", "high", "all"]))
-def show(status, priority):
+@click.option("--arrange", default="status", type=click.Choice(["status", "priority"]))
+def show(status, priority, arrange):
+    filtered_tasks = []
+    def sort_by_status(task:dict):
+        flag=None
+        if task["status"]=="pending":
+            flag=0
+        else:
+            flag=1
+        return flag
+    def sort_by_priority(task:dict):
+        flag=None
+        if task["priority"]=="low":
+            flag=0
+        elif task["priority"]=="medium":
+            flag=1
+        else:
+            flag=2
+        return flag
     if status!="all" and priority=="all":
         for task in all_tasks:
             if task["status"]==status:
-                click.echo(f"title : {task["title"]}, priority : {task["priority"]}, id : {task["id"]}")
+                filtered_tasks.append(task)
     elif status!= "all" and priority!="all":
         for task in all_tasks:
             if task["status"]==status and task["priority"]==priority:
-                click.echo(f"title : {task["title"]}, id : {task["id"]}")
+                filtered_tasks.append(task)
     elif status=="all" and priority!="all":
         for task in all_tasks:
             if task["priority"]==priority:
-                click.echo(f"title : {task["title"]}, status : {task["status"]}, id : {task["id"]}")
+                filtered_tasks.append(task)
     elif status == "all" and priority == "all":
         if len(all_tasks)>0:
             for task in all_tasks:
-                click.echo(f"title : {task["title"]}, status : {task["status"]}, priority : {task["priority"]}, id : {task["id"]}")
+                filtered_tasks.append(task)
         else:
-            click.echo("No tasks right now!")     
+            click.echo("No tasks right now!")
+    if arrange=="status":
+        filtered_tasks.sort(key=sort_by_status)
+    else:
+        filtered_tasks.sort(key=sort_by_priority, reverse=True)
+    for t in filtered_tasks:
+        click.echo(f"title : {t["title"]}, status : {t["status"]}, priority : {t["priority"]}, id : {t["id"]}")  
 @todo.command(help="lets you delete tasks!")
 @click.argument("id")
 def delete(id):
