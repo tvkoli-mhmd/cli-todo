@@ -73,6 +73,8 @@ def show(status, priority, arrange):
 def delete(id):
     if id.lower()=="all":
         all_tasks.clear()
+    elif len(all_tasks) ==0:
+        click.echo("there is nothing to delete!")
     else:
         del all_tasks[int(id)]
         for t in all_tasks:
