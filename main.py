@@ -23,12 +23,27 @@ def add(task, priority):
     with open("tasks.json", 'w') as f:
         json.dump(data, f)
 @todo.command(help="lists all the current tasks! ")
-def show():
-    if len(all_tasks) > 0:
+@click.option("--status", help="only shows tasks with specified status by the user", default="all", type=click.Choice(["done", "pending", "all"]))
+@click.option("--priority", help="only shows tasks with specified priority by the user", default="all", type=click.Choice(["low", "medium", "high", "all"]))
+def show(status, priority):
+    if status!="all" and priority=="all":
         for task in all_tasks:
-            click.echo(f"title : {task["title"]}, status : {task["status"]}, id : {task["id"]}, priority : {task["priority"]}")
-    else:
-        click.echo("No tasks right now!")
+            if task["status"]==status:
+                click.echo(f"title : {task["title"]}, priority : {task["priority"]}, id : {task["id"]}")
+    elif status!= "all" and priority!="all":
+        for task in all_tasks:
+            if task["status"]==status and task["priority"]==priority:
+                click.echo(f"title : {task["title"]}, id : {task["id"]}")
+    elif status=="all" and priority!="all":
+        for task in all_tasks:
+            if task["priority"]==priority:
+                click.echo(f"title : {task["title"]}, status : {task["status"]}, id : {task["id"]}")
+    elif status == "all" and priority == "all":
+        if len(all_tasks)>0:
+            for task in all_tasks:
+                click.echo(f"title : {task["title"]}, status : {task["status"]}, priority : {task["priority"]}, id : {task["id"]}")
+        else:
+            click.echo("No tasks right now!")     
 @todo.command(help="lets you delete tasks!")
 @click.argument("id")
 def delete(id):
@@ -60,4 +75,4 @@ def edit(task_id, title, priority):
         json.dump(data, f)
 
 if __name__ == '__main__':
-    todo()
+    todo() 
